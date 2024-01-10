@@ -1,5 +1,6 @@
 import { WebSocketServer } from "ws"
-import express from 'express'
+import express from "express"
+import { nanoid } from "nanoid"
 import GameSession from "./gameSession.js"
 import { log } from "./utils.js"
 
@@ -15,9 +16,10 @@ webSocketServer.on('listening', () => {
 })
 
 webSocketServer.on('connection', (socket) => {
-    log('New player connecting')
+    socket.id = nanoid(6)
+    log(`New client connecting with socket id ${socket.id}`)
     socket.on('message', (message) => {
-        gameSession.processMessage(message)
+        gameSession.processMessage(message, socket)
     })
     socket.on('error', (error) => {
         log(`Server received error from socket:`, error)

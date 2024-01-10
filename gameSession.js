@@ -6,15 +6,15 @@ export default class GameSession {
         this.sceneDiscovery = null
     }
 
-    processMessage(unparsedMessage) {
+    processMessage(unparsedMessage, socket) {
         const message = JSON.parse(unparsedMessage)
         switch (message.method) {
             case 'player_registration':
-                log(`Registering player ${message.playerId}`)
+                log(`Registering player ${message.playerId} with type ${message.data.playerType} on socket id ${socket.id}`)
                 const newPlayer = {
-                    id: message.playerId,
-                    type: message.data.playerType,
-                    name: message.data.playerName
+                    playerId: message.playerId,
+                    playerType: message.data.playerType,
+                    socketId: socket.id
                 }
                 this.players.push(newPlayer)
                 break
