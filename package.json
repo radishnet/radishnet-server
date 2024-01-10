@@ -1,0 +1,17 @@
+{
+  "name": "open-mux-server",
+  "version": "1.0.0",
+  "description": "The server is the central hub. It connects clients together, holds the world state and serves data to GUIs.",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "dev": "node server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Jelle Wolbers",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "ws": "^8.16.0"
+  }
+}
