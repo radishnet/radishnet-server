@@ -18,11 +18,18 @@ webSocketServer.on('listening', () => {
 webSocketServer.on('connection', (socket) => {
     socket.id = nanoid(6)
     log(`New client connecting with socket id ${socket.id}`)
+    gameSession.addPlayer(socket)
+
     socket.on('message', (message) => {
         gameSession.processMessage(message, socket)
     })
+
     socket.on('error', (error) => {
         log(`Server received error from socket:`, error)
+    })
+
+    socket.on('close', () => {
+        gameSession.removePlayer(socket.id)
     })
 })
 

@@ -3,7 +3,14 @@ import { log } from "./utils.js"
 export default class GameSession {
     constructor() {
         this.players = []
-        this.sceneDiscovery = null
+    }
+
+    addPlayer(socket) {
+        const newPlayer = {
+            state: null,
+            socket: socket,
+        }
+        this.players.push(newPlayer)
     }
 
     processMessage(unparsedMessage, socket) {
@@ -17,5 +24,13 @@ export default class GameSession {
                 console.warn(`Unknown message method: ${message.method}`)
                 break
         }
+    }
+
+    removePlayer(socketId) {
+        log(`Socket ${socketId} closed, removing corresponding player`)
+
+        this.players = this.players.filter((player) => {
+            return player.socket.id !== socketId
+        })
     }
 }
