@@ -15,10 +15,10 @@ export default class GameSession {
 
     processMessage(unparsedMessage, socket) {
         const message = JSON.parse(unparsedMessage)
-        log(message)
         switch (message.method) {
             case 'player_state':
-                log('Got player state message')
+                const player = this.players.find((player) => player.socket.id === socket.id)
+                player.state = message.data
                 break
             default:
                 console.warn(`Unknown message method: ${message.method}`)
@@ -28,9 +28,6 @@ export default class GameSession {
 
     removePlayer(socketId) {
         log(`Socket ${socketId} closed, removing corresponding player`)
-
-        this.players = this.players.filter((player) => {
-            return player.socket.id !== socketId
-        })
+        this.players = this.players.filter(player => player.socket.id !== socketId)
     }
 }
