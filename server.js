@@ -1,4 +1,4 @@
-import { WebSocketServer } from "ws"
+import { WebSocketServer, WebSocket } from "ws"
 import express from "express"
 import { nanoid } from "nanoid"
 import GameSession from "./gameSession.js"
@@ -6,6 +6,7 @@ import { log } from "./utils.js"
 
 const WEBSOCKET_SERVER_PORT = 3000
 const API_SERVER_PORT = 3001
+const SEND_WORLD_STATE_HZ = 1
 
 const webSocketServer = new WebSocketServer({port: WEBSOCKET_SERVER_PORT})
 const apiServer = express()
@@ -32,6 +33,32 @@ webSocketServer.on('connection', (socket) => {
         gameSession.removePlayer(socket.id)
     })
 })
+
+const sendWorldStateInterval = setInterval(() => {
+    sendWorldState()
+}, 1 / SEND_WORLD_STATE_HZ * 1000)
+
+function sendWorldState() {
+    const playerStates = gameSession.players.map(player => ({
+        "state": player.state,
+    }))
+
+    const worldState = {
+        "world_info": null,
+        "player_states": playerStates,
+        "object_states": null,
+    }
+
+    const worldStateMessage = {
+        messageType: "world_state",
+        data: worldState
+    }
+
+    webSocketServer.clients.forEach(webSocketClient => {
+        if (webSocketClient.readyState !== WebSocket.OPEN) return
+        webSocketClient.send(JSON.stringify(worldStateMessage));
+    });
+}
 
 webSocketServer.on('error', (error) => {
     log(`Server received error: ${error}`)
