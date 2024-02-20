@@ -1,11 +1,20 @@
 import { WebSocket } from "ws"
 
-export type Player = {
+export type VRPlayer = {
+    socket: WebSocketWithId
     state: PlayerState
+}
+
+export type GuiClient = {
     socket: WebSocketWithId
 }
 
+export type WebSocketWithId = WebSocket & {
+    id: string
+}
+
 export type PlayerState = {
+    id: string
     headPosition: {
         x: number
         y: number
@@ -19,13 +28,9 @@ export type PlayerState = {
     }
 }
 
-export type WebSocketWithId = WebSocket & {
-    id: string
-}
-
 export type Message<T> = {
     type: string
-    data: T
+    payload: T
 }
 
 export type WorldStateMessage = Message<WorldState>

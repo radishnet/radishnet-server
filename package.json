@@ -2,11 +2,12 @@
     "name": "open-mux-server",
     "version": "1.0.0",
     "description": "The server is the central hub. It connects clients together, holds the world state and serves data to GUIs.",
-    "main": "server.js",
+    "main": "index.js",
     "type": "module",
     "scripts": {
         "build": "tsc",
-        "dev": "nodemon --esm src/server.ts"
+        "start": "tsc && node dist/index.js",
+        "dev": "nodemon --esm src/index.ts"
     },
     "author": "Jelle Wolbers",
     "license": "MIT",
