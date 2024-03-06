@@ -40,7 +40,8 @@ export default class VrPlayerServer {
             state: null,
         }
         this.vrPlayers.push(newVRPlayer)
-        log(`Added VR Player "${socket.id}". Currently connected VR Players: "${this.getCurrentlyConnectedVrPlayersString()}"`)
+        log(`Added VR Player "${socket.id}"`)
+        this.logAllCurrentConnections()
     }
 
     private bindSocketEvents(socket: WebSocketWithId) {
@@ -51,7 +52,7 @@ export default class VrPlayerServer {
             log(`VrPlayerServer received error from socket:` + error)
         })
         socket.on("close", () => {
-            log(`Socket ${socket.id} closed, removing corresponding VR player`)
+            log(`Socket ${socket.id} closed`)
             this.removeVRPlayer(socket.id)
         })
     }
@@ -79,8 +80,10 @@ export default class VrPlayerServer {
     }
 
     private removeVRPlayer(socketId: string) {
-        this.vrPlayers = this.vrPlayers.filter((player) => player.socket.id !== socketId)
-        log(`Removed VR Player "${socketId}". Currently connected VR Players: "${this.getCurrentlyConnectedVrPlayersString()}"`)
+        const indexOfVRPlayerToRemove = this.vrPlayers.findIndex((vrPlayer) => vrPlayer.socket.id === socketId)
+        this.vrPlayers.splice(indexOfVRPlayerToRemove, 1)
+        log(`Removed VR Player "${socketId}"`)
+        this.logAllCurrentConnections()
     }
 
     private startSendWorldStateInterval() {
@@ -121,7 +124,9 @@ export default class VrPlayerServer {
         return worldState
     }
 
-    private getCurrentlyConnectedVrPlayersString() {
-        return this.vrPlayers.map((vrPlayer) => vrPlayer.socket.id).join(", ")
+    private logAllCurrentConnections() {
+        const allCurrentVRPlayerConnections = this.vrPlayers.map((vrPlayer) => vrPlayer.socket.id).join(", ")
+        const allCurrentGuiClientConnections = this.guiClients.map((guiClient) => guiClient.socket.id).join(", ")
+        log(`Current VR Players: ${allCurrentVRPlayerConnections} | Current GUI Clients: ${allCurrentGuiClientConnections}`)
     }
 }

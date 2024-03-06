@@ -38,7 +38,8 @@ export default class GuiClientServer {
             socket: socket,
         }
         this.guiClients.push(newGuiClient)
-        log(`Added GUI Client "${socket.id}". Currently connected GUI Clients: "${this.getCurrentlyConnectedGuiClientsString()}"`)
+        log(`Added GUI Client "${socket.id}"`)
+        this.logAllCurrentConnections()
     }
 
     private bindSocketEvents(socket: WebSocketWithId) {
@@ -49,7 +50,7 @@ export default class GuiClientServer {
             log(`GuiClientServer received error from socket:` + error)
         })
         socket.on("close", () => {
-            log(`Socket ${socket.id} closed, removing corresponding GUI client`)
+            log(`Socket ${socket.id} closed`)
             this.removeGuiClient(socket.id)
         })
     }
@@ -70,8 +71,10 @@ export default class GuiClientServer {
     }
 
     private removeGuiClient(socketId: string) {
-        this.guiClients = this.guiClients.filter((guiClient) => guiClient.socket.id !== socketId)
-        log(`Removed GUI Client "${socketId}". Currently connected GUI Clients: "${this.getCurrentlyConnectedGuiClientsString()}"`)
+        const indexOfGuiClientToRemove = this.guiClients.findIndex((guiClient) => guiClient.socket.id === socketId)
+        this.guiClients.splice(indexOfGuiClientToRemove, 1)
+        log(`Removed GUI Client "${socketId}"`)
+        this.logAllCurrentConnections()
     }
 
     private startSendWorldStateInterval() {
@@ -112,7 +115,9 @@ export default class GuiClientServer {
         return worldState
     }
 
-    private getCurrentlyConnectedGuiClientsString() {
-        return this.guiClients.map((guiClient) => guiClient.socket.id).join(", ")
+    private logAllCurrentConnections() {
+        const allCurrentVRPlayerConnections = this.vrPlayers.map((vrPlayer) => vrPlayer.socket.id).join(", ")
+        const allCurrentGuiClientConnections = this.guiClients.map((guiClient) => guiClient.socket.id).join(", ")
+        log(`Current VR Players: ${allCurrentVRPlayerConnections} | Current GUI Clients: ${allCurrentGuiClientConnections}`)
     }
 }
