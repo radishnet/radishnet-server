@@ -21,7 +21,6 @@ export default class VrPlayerServer {
         })
         this.webSocketServer.on("connection", (socket: WebSocketWithId) => {
             socket.id = nanoid(6)
-            log(`New VR Player connecting with socket id ${socket.id}`)
             this.addVRPlayer(socket)
             this.bindSocketEvents(socket)
             this.sendPlayerId(socket)
@@ -41,6 +40,7 @@ export default class VrPlayerServer {
             state: null,
         }
         this.vrPlayers.push(newVRPlayer)
+        log(`Added VR Player "${socket.id}". Currently connected VR Players: "${this.getCurrentlyConnectedVrPlayersString()}"`)
     }
 
     private bindSocketEvents(socket: WebSocketWithId) {
@@ -51,6 +51,7 @@ export default class VrPlayerServer {
             log(`VrPlayerServer received error from socket:` + error)
         })
         socket.on("close", () => {
+            log(`Socket ${socket.id} closed, removing corresponding VR player`)
             this.removeVRPlayer(socket.id)
         })
     }
@@ -78,8 +79,8 @@ export default class VrPlayerServer {
     }
 
     private removeVRPlayer(socketId: string) {
-        log(`Socket ${socketId} closed, removing corresponding VR player`)
         this.vrPlayers = this.vrPlayers.filter((player) => player.socket.id !== socketId)
+        log(`Removed VR Player "${socketId}". Currently connected VR Players: "${this.getCurrentlyConnectedVrPlayersString()}"`)
     }
 
     private startSendWorldStateInterval() {
@@ -118,5 +119,9 @@ export default class VrPlayerServer {
             objectStates: objectStates,
         }
         return worldState
+    }
+
+    private getCurrentlyConnectedVrPlayersString() {
+        return this.vrPlayers.map((vrPlayer) => vrPlayer.socket.id).join(", ")
     }
 }

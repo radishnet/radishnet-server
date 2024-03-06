@@ -21,7 +21,6 @@ export default class GuiClientServer {
         })
         this.webSocketServer.on("connection", (socket: WebSocketWithId) => {
             socket.id = nanoid(6)
-            log(`New GUI Client connecting with socket id ${socket.id}`)
             this.addGuiClient(socket)
             this.bindSocketEvents(socket)
         })
@@ -39,6 +38,7 @@ export default class GuiClientServer {
             socket: socket,
         }
         this.guiClients.push(newGuiClient)
+        log(`Added GUI Client "${socket.id}". Currently connected GUI Clients: "${this.getCurrentlyConnectedGuiClientsString()}"`)
     }
 
     private bindSocketEvents(socket: WebSocketWithId) {
@@ -49,6 +49,7 @@ export default class GuiClientServer {
             log(`GuiClientServer received error from socket:` + error)
         })
         socket.on("close", () => {
+            log(`Socket ${socket.id} closed, removing corresponding GUI client`)
             this.removeGuiClient(socket.id)
         })
     }
@@ -69,8 +70,8 @@ export default class GuiClientServer {
     }
 
     private removeGuiClient(socketId: string) {
-        log(`Socket ${socketId} closed, removing corresponding GUI client`)
         this.guiClients = this.guiClients.filter((guiClient) => guiClient.socket.id !== socketId)
+        log(`Removed GUI Client "${socketId}". Currently connected GUI Clients: "${this.getCurrentlyConnectedGuiClientsString()}"`)
     }
 
     private startSendWorldStateInterval() {
@@ -109,5 +110,9 @@ export default class GuiClientServer {
             objectStates: objectStates,
         }
         return worldState
+    }
+
+    private getCurrentlyConnectedGuiClientsString() {
+        return this.guiClients.map((guiClient) => guiClient.socket.id).join(", ")
     }
 }
