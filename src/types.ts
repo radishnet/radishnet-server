@@ -33,6 +33,8 @@ export type Message<T> = {
     payload: T
 }
 
+export type PlayerIdMessage = Message<string>
+
 export type WorldStateMessage = Message<WorldState>
 
 export type WorldState = {

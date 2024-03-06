@@ -1,6 +1,6 @@
 import { Data, WebSocket, WebSocketServer } from "ws"
 import { nanoid } from "nanoid"
-import { VRPlayer, GuiClient, WebSocketWithId, WorldState, WorldStateMessage, WorldInfo, ObjectState, PlayerState } from "./types.js"
+import { VRPlayer, GuiClient, WebSocketWithId, WorldState, WorldStateMessage, WorldInfo, ObjectState, PlayerState, PlayerIdMessage } from "./types.js"
 import { log } from "./utils.js"
 
 const VR_PLAYER_SERVER_PORT = 3000
@@ -24,6 +24,7 @@ export default class VrPlayerServer {
             log(`New VR Player connecting with socket id ${socket.id}`)
             this.addVRPlayer(socket)
             this.bindSocketEvents(socket)
+            this.sendPlayerId(socket)
         })
         this.webSocketServer.on("error", (error: Error) => {
             log(`VrPlayerServer received error: ${error}`)
@@ -52,6 +53,14 @@ export default class VrPlayerServer {
         socket.on("close", () => {
             this.removeVRPlayer(socket.id)
         })
+    }
+
+    private sendPlayerId(socket: WebSocketWithId) {
+        const playerIdMessage: PlayerIdMessage = {
+            type: "PlayerIdMessage",
+            payload: socket.id,
+        }
+        socket.send(JSON.stringify(playerIdMessage))
     }
 
     private processMessage(unparsedMessage: Data, socket: WebSocketWithId) {
