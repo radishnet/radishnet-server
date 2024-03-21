@@ -14,12 +14,17 @@ export type WebSocketWithId = WebSocket & {
 
 export type PlayerState = {
     clientId: string
-    headPosition: {
+    playerObjects: NetworkObject[]
+}
+
+export type NetworkObject = {
+    id: string
+    position: {
         x: number
         y: number
         z: number
     }
-    headRotation: {
+    rotation: {
         x: number
         y: number
         z: number
