@@ -13,7 +13,7 @@ export type WebSocketWithId = WebSocket & {
 }
 
 export type PlayerState = {
-    id: string
+    clientId: string
     headPosition: {
         x: number
         y: number
@@ -31,6 +31,8 @@ export type Message<T> = {
     type: string
     payload: T
 }
+
+export type ClientIdMessage = Message<string>
 
 export type WorldStateMessage = Message<WorldState>
 

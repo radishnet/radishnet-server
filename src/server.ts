@@ -1,7 +1,7 @@
 import { Data, WebSocket, WebSocketServer } from "ws"
 import { nanoid } from "nanoid"
 import { parse } from "url"
-import { Client, ClientType, WebSocketWithId, WorldState, WorldStateMessage, WorldInfo, ObjectState, PlayerState } from "./types.js"
+import { Client, ClientType, WebSocketWithId, WorldState, WorldStateMessage, WorldInfo, ObjectState, PlayerState, ClientIdMessage } from "./types.js"
 import { log } from "./utils.js"
 
 const SERVER_PORT = 3000
@@ -20,6 +20,7 @@ server.on("connection", (socket: WebSocketWithId, req) => {
     socket.id = nanoid(6)
     addClient(clientType, socket)
     bindSocketEvents(socket)
+    sendClientIdToClient(socket)
 })
 
 function addClient(clientType: ClientType, socket: WebSocketWithId) {
@@ -55,6 +56,14 @@ function processMessage(unparsedMessage: Data, socket: WebSocketWithId) {
             console.warn(`Unknown message type: ${message.type}`)
             break
     }
+}
+
+function sendClientIdToClient(socket: WebSocketWithId) {
+    const clientIdMessage: ClientIdMessage = {
+        type: "ClientIdMessage",
+        payload: socket.id,
+    }
+    socket.send(JSON.stringify(clientIdMessage))
 }
 
 function removeClient(socket: WebSocketWithId) {
@@ -110,7 +119,7 @@ function getWorldState(): WorldState {
         })
         .map((client) => ({
             ...client.state,
-            id: client.socket.id,
+            clientId: client.socket.id,
         }))
     const objectStates: ObjectState[] = []
     const worldState: WorldState = {
