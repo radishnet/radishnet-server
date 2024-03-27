@@ -5,7 +5,7 @@ import { Client, ClientType, WebSocketWithId, WorldState, WorldStateMessage, Wor
 import { log } from "./utils.js"
 
 const SERVER_PORT = 3000
-const SEND_WORLD_STATE_HZ = 1
+const SEND_WORLD_STATE_HZ = 60
 
 const server = new WebSocketServer({ port: SERVER_PORT })
 let clients: Client[] = []
