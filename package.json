@@ -1,7 +1,7 @@
 {
-    "name": "open-mux-server",
+    "name": "radishnet-server",
     "version": "1.0.0",
-    "description": "The server is the central hub of Open MUX. It connects clients together, holds the world state and serves data to GUIs.",
+    "description": "The Server functions as the connection hub of RadishNet. It holds the most recent world state and is required for RadishNet to work.",
     "main": "index.js",
     "type": "module",
     "scripts": {
