@@ -10,9 +10,7 @@ const SEND_WORLD_STATE_HZ = 60
 const server = new WebSocketServer({ port: SERVER_PORT })
 let clients: Client[] = []
 
-server.on("listening", () => {
-    log(`Server is listening for connections...`)
-})
+server.on("listening", () => log(`Server is listening for connections...`))
 
 server.on("connection", (socket: WebSocketWithId, req) => {
     const parsedRequestUrl = parse(req.url, true, true)
@@ -33,12 +31,8 @@ function addClient(clientType: ClientType, socket: WebSocketWithId) {
 }
 
 function bindSocketEvents(socket: WebSocketWithId) {
-    socket.on("message", (message: Data) => {
-        processMessage(message, socket)
-    })
-    socket.on("error", (error: Error) => {
-        log(`Server received error from socket:` + error)
-    })
+    socket.on("message", (message: Data) => processMessage(message, socket))
+    socket.on("error", (error: Error) => log(`Server received error from socket:` + error))
     socket.on("close", () => {
         log(`Socket ${socket.id} closed`)
         removeClient(socket)
@@ -75,27 +69,14 @@ function removeClient(socket: WebSocketWithId) {
 }
 
 function currentlyConnectedClientsString(): string {
-    return clients
-        .map((client) => {
-            return `${client.socket.id} (${client.clientType})`
-        })
-        .join(", ")
+    return clients.map((client) => `${client.socket.id} (${client.clientType})`).join(", ")
 }
 
-server.on("error", (error: Error) => {
-    log(`Server received error: ${error}`)
-})
+server.on("error", (error: Error) => log(`Server received error: ${error}`))
 
-server.on("close", () => {
-    log(`Server closed connection`)
-})
+server.on("close", () => log(`Server closed connection`))
 
-setInterval(
-    () => {
-        sendWorldStateToClients()
-    },
-    (1 / SEND_WORLD_STATE_HZ) * 1000
-)
+setInterval(sendWorldStateToClients, (1 / SEND_WORLD_STATE_HZ) * 1000)
 
 function sendWorldStateToClients() {
     const worldState = getWorldState()
@@ -114,9 +95,7 @@ function getWorldState(): WorldState {
         weather: "sunny",
     }
     const playerStates: PlayerState[] = clients
-        .filter((client) => {
-            return client.clientType === "vr"
-        })
+        .filter((client) => client.clientType === "vr")
         .map((client) => ({
             ...client.state,
             clientId: client.socket.id,
