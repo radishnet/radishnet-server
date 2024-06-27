@@ -5,12 +5,10 @@ import { log } from "./utils.js"
 
 const SERVER_PORT = 3000
 const SEND_WORLD_STATE_HZ = 60
-
-const server = new WebSocketServer({ port: SERVER_PORT })
 let clients = []
 
+const server = new WebSocketServer({ port: SERVER_PORT })
 server.on("listening", () => log(`Server is listening for connections...`))
-
 server.on("connection", (socket, req) => {
     const parsedRequestUrl = parse(req.url, true, true)
     const clientType = parsedRequestUrl.query?.clientType
@@ -19,6 +17,8 @@ server.on("connection", (socket, req) => {
     bindSocketEvents(socket)
     sendClientIdToClient(socket)
 })
+server.on("error", (error) => log(`Server received error: ${error}`))
+server.on("close", () => log(`Server closed connection`))
 
 function addClient(clientType, socket) {
     const newClient = {
@@ -71,12 +71,6 @@ function currentlyConnectedClientsString() {
     return clients.map((client) => `${client.socket.id} (${client.clientType})`).join(", ")
 }
 
-server.on("error", (error) => log(`Server received error: ${error}`))
-
-server.on("close", () => log(`Server closed connection`))
-
-setInterval(sendWorldStateToClients, (1 / SEND_WORLD_STATE_HZ) * 1000)
-
 function sendWorldStateToClients() {
     const worldState = getWorldState()
     const worldStateMessage = {
@@ -107,3 +101,5 @@ function getWorldState() {
     }
     return worldState
 }
+
+setInterval(sendWorldStateToClients, (1 / SEND_WORLD_STATE_HZ) * 1000)
