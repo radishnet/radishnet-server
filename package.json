@@ -2,11 +2,11 @@
     "name": "radishnet-server",
     "version": "1.0.0",
     "description": "The Server functions as the connection hub of RadishNet. It holds the most recent world state and is required for RadishNet to work.",
-    "main": "index.js",
+    "main": "server.js",
     "type": "module",
     "scripts": {
-        "build": "tsc",
-        "start": "tsc && node dist/server.js"
+        "dev": "nodemon server.js",
+        "start": "node server.js"
     },
     "author": "Jelle Wolbers",
     "license": "MIT",
@@ -15,9 +15,7 @@
         "ws": "^8.16.0"
     },
     "devDependencies": {
-        "@types/node": "^20.11.16",
-        "@types/ws": "^8.5.10",
-        "prettier": "^3.2.5",
-        "typescript": "^5.3.3"
+        "nodemon": "^3.1.4",
+        "prettier": "^3.2.5"
     }
 }

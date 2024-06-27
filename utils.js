@@ -1,4 +1,4 @@
-export function log(message: string) {
+export function log(message) {
     console.log(`${getCurrentTime()} ${message}`)
 }
 

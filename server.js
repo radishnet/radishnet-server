@@ -1,28 +1,27 @@
-import { Data, WebSocket, WebSocketServer } from "ws"
+import { WebSocket, WebSocketServer } from "ws"
 import { nanoid } from "nanoid"
 import { parse } from "url"
-import { Client, ClientType, WebSocketWithId, WorldState, WorldStateMessage, WorldInfo, ObjectState, PlayerState, ClientIdMessage } from "./types.js"
 import { log } from "./utils.js"
 
 const SERVER_PORT = 3000
 const SEND_WORLD_STATE_HZ = 60
 
 const server = new WebSocketServer({ port: SERVER_PORT })
-let clients: Client[] = []
+let clients = []
 
 server.on("listening", () => log(`Server is listening for connections...`))
 
-server.on("connection", (socket: WebSocketWithId, req) => {
+server.on("connection", (socket, req) => {
     const parsedRequestUrl = parse(req.url, true, true)
-    const clientType = parsedRequestUrl.query?.clientType as ClientType
+    const clientType = parsedRequestUrl.query?.clientType
     socket.id = nanoid(6)
     addClient(clientType, socket)
     bindSocketEvents(socket)
     sendClientIdToClient(socket)
 })
 
-function addClient(clientType: ClientType, socket: WebSocketWithId) {
-    const newClient: Client = {
+function addClient(clientType, socket) {
+    const newClient = {
         clientType: clientType,
         socket: socket,
     }
@@ -30,16 +29,16 @@ function addClient(clientType: ClientType, socket: WebSocketWithId) {
     log(`Added client ${socket.id} (${clientType}). Currently connected: ${currentlyConnectedClientsString()}`)
 }
 
-function bindSocketEvents(socket: WebSocketWithId) {
-    socket.on("message", (message: Data) => processMessage(message, socket))
-    socket.on("error", (error: Error) => log(`Server received error from socket:` + error))
+function bindSocketEvents(socket) {
+    socket.on("message", (message) => processMessage(message, socket))
+    socket.on("error", (error) => log(`Server received error from socket:` + error))
     socket.on("close", () => {
         log(`Socket ${socket.id} closed`)
         removeClient(socket)
     })
 }
 
-function processMessage(unparsedMessage: Data, socket: WebSocketWithId) {
+function processMessage(unparsedMessage, socket) {
     const message = JSON.parse(unparsedMessage.toString())
     switch (message.type) {
         case "PlayerStateMessage":
@@ -52,15 +51,15 @@ function processMessage(unparsedMessage: Data, socket: WebSocketWithId) {
     }
 }
 
-function sendClientIdToClient(socket: WebSocketWithId) {
-    const clientIdMessage: ClientIdMessage = {
+function sendClientIdToClient(socket) {
+    const clientIdMessage = {
         type: "ClientIdMessage",
         payload: socket.id,
     }
     socket.send(JSON.stringify(clientIdMessage))
 }
 
-function removeClient(socket: WebSocketWithId) {
+function removeClient(socket) {
     const indexOfClientToRemove = clients.findIndex((client) => client.socket.id === socket.id)
     const removedClientId = clients[indexOfClientToRemove].socket.id
     const removedClientType = clients[indexOfClientToRemove].clientType
@@ -68,11 +67,11 @@ function removeClient(socket: WebSocketWithId) {
     log(`Removed client ${removedClientId} (${removedClientType}). Currently connected: ${currentlyConnectedClientsString()}`)
 }
 
-function currentlyConnectedClientsString(): string {
+function currentlyConnectedClientsString() {
     return clients.map((client) => `${client.socket.id} (${client.clientType})`).join(", ")
 }
 
-server.on("error", (error: Error) => log(`Server received error: ${error}`))
+server.on("error", (error) => log(`Server received error: ${error}`))
 
 server.on("close", () => log(`Server closed connection`))
 
@@ -80,7 +79,7 @@ setInterval(sendWorldStateToClients, (1 / SEND_WORLD_STATE_HZ) * 1000)
 
 function sendWorldStateToClients() {
     const worldState = getWorldState()
-    const worldStateMessage: WorldStateMessage = {
+    const worldStateMessage = {
         type: "WorldStateMessage",
         payload: worldState,
     }
@@ -90,18 +89,18 @@ function sendWorldStateToClients() {
     })
 }
 
-function getWorldState(): WorldState {
-    const worldInfo: WorldInfo = {
+function getWorldState() {
+    const worldInfo = {
         weather: "sunny",
     }
-    const playerStates: PlayerState[] = clients
+    const playerStates = clients
         .filter((client) => client.clientType === "vr")
         .map((client) => ({
             ...client.state,
             clientId: client.socket.id,
         }))
-    const objectStates: ObjectState[] = []
-    const worldState: WorldState = {
+    const objectStates = []
+    const worldState = {
         worldInfo: worldInfo,
         playerStates: playerStates,
         objectStates: objectStates,
