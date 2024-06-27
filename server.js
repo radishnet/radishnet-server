@@ -3,7 +3,7 @@ import { nanoid } from "nanoid"
 import { parse } from "url"
 import { log } from "./utils.js"
 
-const SERVER_PORT = 3000
+const SERVER_PORT = process.env.SERVER_PORT || 3000
 const SEND_WORLD_STATE_HZ = 60
 let clients = []
 

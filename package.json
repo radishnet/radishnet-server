@@ -6,7 +6,9 @@
     "type": "module",
     "scripts": {
         "dev": "nodemon server.js",
-        "start": "node server.js"
+        "start": "node server.js",
+        "docker-build": "docker build -t radishnet-server .",
+        "docker-run": "docker run -p 3000:3000 radishnet-server"
     },
     "author": "Jelle Wolbers",
     "license": "MIT",
