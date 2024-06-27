@@ -2,13 +2,13 @@
     "name": "radishnet-server",
     "version": "1.0.0",
     "description": "The Server functions as the connection hub of RadishNet. It holds the most recent world state and is required for RadishNet to work.",
-    "main": "server.js",
+    "main": "src/server.js",
     "type": "module",
     "scripts": {
-        "dev": "nodemon server.js",
-        "start": "node server.js",
+        "dev": "nodemon src/server.js",
+        "start": "node src/server.js",
         "docker-build": "docker build -t radishnet-server .",
-        "docker-run": "docker run -p 3000:3000 radishnet-server"
+        "docker-run": "docker run -p 3000:3000 --name radishnet-server radishnet-server"
     },
     "author": "Jelle Wolbers",
     "license": "MIT",
