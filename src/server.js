@@ -88,7 +88,7 @@ function getWorldState() {
         weather: "sunny",
     }
     const playerStates = clients
-        .filter((client) => client.clientType === "unity")
+        .filter((client) => client.state !== undefined)
         .map((client) => ({
             ...client.state,
             clientId: client.socket.id,
